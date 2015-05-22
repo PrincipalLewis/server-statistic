@@ -82,7 +82,7 @@ mysr.db.getTopCommiterTeam = function(callback) {};
 /**
  *
  */
-mysr.db.topCommiterTeam = function() {};
+mysr.db.topCommiterTeam = function(response) {};
 
 
 /**
@@ -94,7 +94,7 @@ mysr.db.getTopCommiter = function(callback) {};
 /**
  *
  */
-mysr.db.topCommiter = function() {};
+mysr.db.topCommiter = function(response) {};
 
 
 /**
@@ -106,7 +106,13 @@ mysr.db.getFileName = function(callback) {};
 /**
  *
  */
-mysr.db.topCommitFileName = function() {};
+mysr.db.topCommitFileName = function(response) {};
+
+
+/**
+ *
+ */
+mysr.db.topTeamCommitFileName = function(file, response) {};
 
 
 /**

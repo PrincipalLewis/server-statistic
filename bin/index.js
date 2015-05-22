@@ -34,7 +34,11 @@ mysr.init = function() {
   mysr.startServer(mysr.router);
 };
 
-
+mysr.headers = function(response) {
+  response.writeHead(200, {
+    'Access-Control-Allow-Origin': '*',
+    'Content-Type': 'text/plain' });
+};
 /**
  * @param {string} path
  * @param {object} payload
@@ -42,71 +46,39 @@ mysr.init = function() {
  */
 mysr.router = function(path, payload, response) {
   console.log(path);
+  mysr.headers(response);
   if (path === '/fileName') {
-    response.writeHead(200, {
-      'Access-Control-Allow-Origin': '*',
-      'Content-Type': 'text/plain' });
-    mysr.db.getFileName(function(filesname) {
-      //for (var j = 0; j < filesname.length; j++) {
-      console.log(filesname[0]);
-        mysr.db.getTeamFileName(filesname[0], function (teams, projectName) {
-          for (var i = 0, name = '',count = ''; i < teams.length; i++) {
-            name += teams[i].teamname + ', ';
-            count += teams[i].count + ', ';
-          }
-          response.end('Имя файла: ' + teams[0].filename + '<br>' +
-          'Имя команд: ' + name + '<br>' +
-          'Count' + count + '<br>' +
-          ' Проект: ' + projectName + '<br>' +
-          '');
-        });
-      //}
-    });
+    mysr.db.topCommitFileName(response);
+  }
+  if (path === '/teamFileName') {
+    mysr.db.topTeamCommitFileName(payload, response);
   }
   if (path === '/getHui') {
-    response.writeHead(200, {
-      'Access-Control-Allow-Origin': '*',
-      'Content-Type': 'text/plain' });
     response.end('Sam Hui');
   }
 
   if (path === '/commitCount') {
-    response.writeHead(200, {
-      'Access-Control-Allow-Origin': '*',
-      'Content-Type': 'text/plain' });
-    mysr.db.getProjectsCommitCount(function(table) {
-      response.end('Проект ' + table[0].projectname + ' commits: ' + table[0].commits);
-    });
+    mysr.db.projectsCommitCount(response);
   }
 
   if (path === '/teamProjects') {
-    response.writeHead(200, {
-      'Access-Control-Allow-Origin': '*',
-      'Content-Type': 'text/plain' });
-    mysr.db.getTeamsProjects(function(table) {
-      console.log(table);
-      response.end('Проект ' + table[0].projectname + ' commits: ' + table[0].teamname);
-    });
+    mysr.db.teamsProjects(response);
   }
 
   if (path === '/topCommiter') {
-    response.writeHead(200, {
-      'Access-Control-Allow-Origin': '*',
-      'Content-Type': 'text/plain' });
-    mysr.db.getTopCommiter(function(table) {
-      console.log(table);
-      response.end('User ' + table[0].login + ' count_commits: ' + table[0].count);
-    });
+    mysr.db.topCommiter(response);
+
   }
 
   if (path === '/topCommiterTeam') {
-    response.writeHead(200, {
-      'Access-Control-Allow-Origin': '*',
-      'Content-Type': 'text/plain' });
-    mysr.db.getTopCommiterTeam(function(table) {
-      console.log(table);
-      response.end('User ' + table[3].teamname + ' count_commits: ' + table[3].commits);
-    });
+    mysr.db.topCommiterTeam(response);
+  }
+
+
+  if (path === '/sendDate') {
+    mysr.db.sendDate(payload);
+    console.log(mysr.db.date);
+    response.end(mysr.db.date);
   }
 
 };
@@ -121,6 +93,7 @@ mysr.startServer = function(requestHandler) {
     var data = '';
     req.on('data', function(chunk) {
       data += chunk;
+
     });
 
     req.on('end', function() {
@@ -150,7 +123,13 @@ pg.init(20, {
  * @param {string} until format: YYYY-MM-DD
  */
 mysr.db.sendDate = function(since, until) {
-  mysr.db.date += ' BETWEEN \'' + since + '\' AND \'' + until + '\' ';
+  if (!since) {
+    since = ''
+  }
+  if (!until) {
+    until = since
+  }
+  mysr.db.date = ' BETWEEN \'' + since + '\' AND \'' + until + '\' ';
 };
 
 
@@ -194,6 +173,15 @@ mysr.db.getProjectsCommitCount = function(callback) {
       function(table) {
         callback(table);
       }, console.error);
+};
+
+
+mysr.db.projectsCommitCount = function(response) {
+  mysr.db.getTopProject(function(table) {
+    var string = JSON.stringify(table);
+    //console.log(a);
+    response.end(string);
+  });
 };
 
 
@@ -279,13 +267,10 @@ mysr.db.getTopCommiterTeam = function(callback) {
 /**
  *
  */
-mysr.db.topCommiterTeam = function() {
-  console.log('Top teams commits');
-  mysr.db.getTopCommiterTeam(function(commiters) {
-    for (var i = 0; i < commiters.length; i++) {
-      console.log(commiters[i]);
-    }
-
+mysr.db.topCommiterTeam = function(response) {
+  mysr.db.getTopCommiterTeam(function(table) {
+    var string = JSON.stringify(table);
+    response.end(string);
   });
 };
 
@@ -312,12 +297,11 @@ mysr.db.getTopCommiter = function(callback) {
 /**
  *
  */
-mysr.db.topCommiter = function() {
-  console.log('топовый коммитер');
-  mysr.db.getTopCommiter(function(commiters) {
-    for (var i = 0; i < commiters.length; i++) {
-      console.log(commiters[i]);
-    }
+mysr.db.topCommiter = function(response) {
+  mysr.db.getTopCommiter(function(table) {
+    var string = JSON.stringify(table);
+    //console.log(a);
+    response.end(string);
   });
 };
 
@@ -341,7 +325,7 @@ mysr.db.getFileName = function(callback) {
 };
 
 
-mysr.db.getTeamFileName = function(fileName,callback) {
+mysr.db.getTeamFileName = function(file,callback) {
   pg.exec('SELECT git.filesname.filename as filename, ' +
     'git.teams.name as teamname, ' +
     '  COUNT(filename) as COUNT ' +
@@ -351,22 +335,33 @@ mysr.db.getTeamFileName = function(fileName,callback) {
     'LEFT JOIN git.teams ON git.teamsmembers.idt = git.teams.id ' +
     'WHERE git.commits.date' + mysr.db.date +
     'AND git.teams.name  NOT LIKE \'%Read\' ' +
-    'AND git.filesname.filename = \'' + fileName.filename + '\' ' +
+    'AND git.filesname.filename = \'' + file.filename + '\' ' +
     'GROUP BY filename,teamname ' +
     'ORDER BY COUNT DESC',
     function(table) {
-      callback(table, fileName.projectname);
+      callback(table);
     }, console.error);
 };
 
 /**
  *
  */
-mysr.db.topCommitFileName = function() {
+mysr.db.topCommitFileName = function(response) {
   mysr.db.getFileName(function(filesname) {
-    for (var i = 0; i < filesname.length; i++) {
-      console.log(filesname[i]);
-    }
+    var string = JSON.stringify(filesname);
+    //console.log(string);
+    response.end(string);
+  });
+};
+
+
+/**
+ *
+ */
+mysr.db.topTeamCommitFileName = function(file, response) {
+  mysr.db.getTeamFileName(JSON.parse(file), function (teams) {
+    var string = JSON.stringify(teams);
+    response.end(string);
   });
 };
 
@@ -386,6 +381,14 @@ mysr.db.getTeamsProjects = function(callback) {
       }, console.error);
 };
 
+
+mysr.db.teamsProjects = function(response) {
+  mysr.db.getTeamsProjects(function(table) {
+    var string = JSON.stringify(table);
+    //console.log(a);
+    response.end(string);
+  });
+};
 
 /**
  *
