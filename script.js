@@ -15,7 +15,7 @@ function getProjectsCommitCount() {
       document.getElementById('1').innerHTML = '';
       var obj = JSON.parse(msg);
       obj.forEach(function(i) {
-        document.getElementById('1').innerHTML += JSON.stringify(i) + '<br>'
+        document.getElementById('1').innerHTML += JSON.stringify(i) + '<br>';
       });
     }
   });
@@ -27,9 +27,8 @@ function getFileName() {
     success: function(msg) {
       document.getElementById('1').innerHTML = '';
       var obj = JSON.parse(msg);
-      obj.forEach(function(data,i) {
-        if (i < 20) {
-          //console.log(JSON.stringify(data));
+      obj.forEach(function(data, i) {
+        if (i < 10) {
           getTeamFileName(data);
         }
       });
@@ -37,22 +36,23 @@ function getFileName() {
   });
 }
 function getTeamFileName(file) {
-  //console.log(file);
   $.ajax({
     type: 'POST',
     url: 'http://localhost:1337/teamFileName',
     data: JSON.stringify(file),
     success: function(msg) {
-      document.getElementById('1').innerHTML += JSON.stringify(file) + '<br>';
-      //document.getElementById('1').innerHTML = '';
-      var obj = JSON.parse(msg);
-      obj.forEach(function(data,i) {
-        if (i < 10) {
-          //console.log(JSON.stringify(data));
-          document.getElementById('1').innerHTML += JSON.stringify(data) + '<br>'
-        }
-      });
-      document.getElementById('1').innerHTML += '<br>'
+      document.getElementById('tableBody').innerHTML +=
+          '<tr>' +
+              '<td>' + file.projectname + ' ' + file.count + '</td>' +
+              '<td>' + file.filename + '</td>' +
+      //var obj = JSON.parse(msg);
+      //obj.forEach(function(data) {
+      //  document.getElementById('tableBody').innerHTML +=
+                '<td>' + msg + '</td>' +
+                '<td>' + msg + '</td>' +
+            '</tr>';
+      //});
+      //document.getElementById('1').innerHTML += '<br>';
     }
   });
 }
@@ -64,7 +64,7 @@ function getTeamsProjects() {
       document.getElementById('1').innerHTML = '';
       var obj = JSON.parse(msg);
       obj.forEach(function(i) {
-        document.getElementById('1').innerHTML += JSON.stringify(i) + '<br>'
+        document.getElementById('1').innerHTML += JSON.stringify(i) + '<br>';
       });
     }
   });
@@ -78,7 +78,7 @@ function getTopCommiter() {
       document.getElementById('1').innerHTML = '';
       var obj = JSON.parse(msg);
       obj.forEach(function(i) {
-        document.getElementById('1').innerHTML += JSON.stringify(i) + '<br>'
+        document.getElementById('1').innerHTML += JSON.stringify(i) + '<br>';
       });
     }
   });
@@ -93,7 +93,7 @@ function getTopCommiterTeam() {
       document.getElementById('1').innerHTML = '';
       var obj = JSON.parse(msg);
       obj.forEach(function(i) {
-        document.getElementById('1').innerHTML += JSON.stringify(i) + '<br>'
+        document.getElementById('1').innerHTML += JSON.stringify(i) + '<br>';
       });
     }
   });
@@ -104,11 +104,48 @@ function sendDate() {
     type: 'POST',
     url: 'http://localhost:1337/sendDate',
     data: document.getElementById('Date1').value + '%' +
-          document.getElementById('Date2').value,
-    //data2: document.getElementById('Date2').value,
+            document.getElementById('Date2').value,
     success: function(msg) {
-      document.getElementById('1').innerHTML = 'bla' + msg;
+      document.getElementById('1234').innerHTML = 'bla' + msg;
+    }
+  });
+}
+
+function getCrossProjects() {
+  $.ajax({
+    type: 'POST',
+    url: 'http://localhost:1337/teamProjects',
+    success: function(msg) {
+      document.getElementById('1').innerHTML = '';
+      var obj = JSON.parse(msg);
+      get(obj);
     }
   });
 
+  function get(teamsProject) {
+    $.ajax({
+      type: 'POST',
+      url: 'http://localhost:1337/cross',
+      success: function(msg) {
+        document.getElementById('1').innerHTML = '';
+        var projectsTeam = JSON.parse(msg);
+        var flag = 0;
+        for (var i in projectsTeam) {
+          for (var j in teamsProject) {
+            if (projectsTeam[i].projectname === teamsProject[j].projectname) {
+              if (projectsTeam[i].teamname === teamsProject[j].teamname) {
+                flag = 1;
+                break;
+              }
+            }
+          }
+          if (flag === 0) {
+            document.getElementById('1').innerHTML +=
+                projectsTeam[i].projectname + ' ' + projectsTeam[i].teamname +
+                                                          '<br>';
+          } else {flag = 0;}
+        }
+      }
+    });
+  }
 }

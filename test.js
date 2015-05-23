@@ -1,127 +1,7 @@
-var http = require('http'),
-    url = require('url'),
-    path = require('path'),
-    fs = require('fs'),
-    pg = require('node-pg');
-
-/**
- * @namespace
- */
+var pg = require('node-pg');
+//
 mysr = {};
-
-
-/**
- * @namespace
- */
 mysr.db = {};
-
-
-
-mysr.date = '';
-
-
-/**
- *
- */
-mysr.pgConnection = function() {
-  pg.init(20, {
-    'user': 'postgres',
-    'dbname': 'postgres',
-    'hostaddr': '127.0.0.1',
-    'port': '5432'
-  });
-};
-
-
-/**
- * точка входа
- */
-mysr.init = function() {
-  mysr.pgConnection();
-  mysr.startServer(mysr.router);
-};
-
-
-/**
- * @param {function()} response
- */
-mysr.headers = function(response) {
-  response.writeHead(200, {
-    'Access-Control-Allow-Origin': '*',
-    'Content-Type': 'text/plain' });
-};
-
-
-/**
- * @param {string} path
- * @param {object} payload
- * @param {function()} response
- */
-mysr.router = function(path, payload, response) {
-  console.log(path);
-  mysr.headers(response);
-  if (path === '/fileName') {
-    mysr.db.topCommitFileName(response);
-  }
-  if (path === '/teamFileName') {
-    mysr.db.topTeamCommitFileName(payload, response);
-  }
-  if (path === '/getHui') {
-    response.end('Sam Hui');
-  }
-
-  if (path === '/commitCount') {
-    mysr.db.projectsCommitCount(response);
-  }
-
-  if (path === '/teamProjects') {
-    mysr.db.teamsProjects(response);
-  }
-
-  if (path === '/topCommiter') {
-    mysr.db.topCommiter(response);
-
-  }
-
-  if (path === '/topCommiterTeam') {
-    mysr.db.topCommiterTeam(response);
-  }
-  if (path === '/cross') {
-    mysr.db.projectsTeamsCount(response);
-  }
-
-  if (path === '/sendDate') {
-    var date = payload.split('%');
-    mysr.db.date = mysr.db.sendDate(date[0], date[1]);
-    console.log(mysr.db.date);
-    response.end(mysr.db.date);
-  }
-
-};
-
-
-/**
- * Server
- */
-mysr.startServer = function(requestHandler) {
-  var server = new http.Server();
-  server.addListener('request', function(req, res) {
-    var data = '';
-    req.on('data', function(chunk) {
-      data += chunk;
-
-    });
-
-    req.on('end', function() {
-      var path = url.parse(req.url);
-      requestHandler(path.pathname, data, res);
-    });
-  });
-
-  server.listen(1337, '127.0.0.1');
-};
-
-
 
 
 pg.init(20, {
@@ -147,7 +27,7 @@ mysr.db.sendDate = function(since, until) {
   }
   if (!since && !until) {
     console.log('blaaaaaaaaaaaaaa');
-    buffer = ' < current_date ';
+    buffer = ' > current_date-30 ';
   }
   if (since && until) {
     buffer = ' BETWEEN \'' + since + '\' AND \'' + until + '\' ';
@@ -167,19 +47,19 @@ mysr.db.date = '';
  */
 mysr.db.getProjectsTeamsCount = function(callback) {
   pg.exec('SELECT git.project.name AS projectname,' +
-      '(git.teams.name) AS teamName, ' +
-      'COUNT(git.commits.projectid) AS commits ' +
-      'FROM git.commits ' +
-      'LEFT JOIN git.teamsmembers ' +
-      'ON git.commits.login = git.teamsmembers.login ' +
-      'INNER JOIN git.teams ON git.teamsmembers.idt = git.teams.id ' +
-      'LEFT JOIN git.project ON git.project.id = git.commits.projectid ' +
+    '(git.teams.name) AS teamName, ' +
+    'COUNT(git.commits.projectid) AS commits ' +
+    'FROM git.commits ' +
+    'LEFT JOIN git.teamsmembers ' +
+    'ON git.commits.login = git.teamsmembers.login ' +
+    'INNER JOIN git.teams ON git.teamsmembers.idt = git.teams.id ' +
+    'LEFT JOIN git.project ON git.project.id = git.commits.projectid ' +
       //'WHERE git.teams.name NOT LIKE \'%Read\' ' +
-      'GROUP BY  projectname,teamName ' +
-      'ORDER BY projectname,teamName',
-      function(table) {
-        callback(table);
-      }, console.error);
+    'GROUP BY  projectname,teamName ' +
+    'ORDER BY projectname,teamName',
+    function(table) {
+      callback(table);
+    }, console.error);
 };
 
 
@@ -200,14 +80,14 @@ mysr.db.projectsTeamsCount = function(response) {
  */
 mysr.db.getProjectsCommitCount = function(callback) {
   pg.exec('SELECT git.project.name as projectname, ' +
-      'COUNT(git.commits.projectid) AS commits ' +
-      'FROM git.commits ' +
-      'LEFT JOIN git.project ON git.commits.projectid = git.project.id ' +
-      'GROUP BY  projectname ' +
-      'ORDER BY projectname ',
-      function(table) {
-        callback(table);
-      }, console.error);
+    'COUNT(git.commits.projectid) AS commits ' +
+    'FROM git.commits ' +
+    'LEFT JOIN git.project ON git.commits.projectid = git.project.id ' +
+    'GROUP BY  projectname ' +
+    'ORDER BY projectname ',
+    function(table) {
+      callback(table);
+    }, console.error);
 };
 
 
@@ -238,8 +118,8 @@ mysr.db.projectsTeamsCommits = function() {
             console.log(ProjectsCommitCount[j].projectname);
           }
           console.log('   ', projectsTeams[i].teamname,
-              (projectsTeams[i++].commits /
-              ProjectsCommitCount[j].commits * 100).toFixed(3) + '%');
+            (projectsTeams[i++].commits /
+            ProjectsCommitCount[j].commits * 100).toFixed(3) + '%');
           flag = 0;
         } else {
           j++;
@@ -256,15 +136,15 @@ mysr.db.projectsTeamsCommits = function() {
  */
 mysr.db.getTopProject = function(callback) {
   pg.exec('SELECT git.project.name as projectname, ' +
-      'COUNT(git.commits.projectid) AS commits ' +
-      'FROM git.commits ' +
-      'LEFT JOIN git.project ON git.commits.projectid = git.project.id ' +
-      'WHERE git.commits.date' + mysr.db.date +
-      'GROUP BY  projectname ' +
-      'ORDER BY commits DESC ',
-      function(table) {
-        callback(table);
-      }, console.error);
+    'COUNT(git.commits.projectid) AS commits ' +
+    'FROM git.commits ' +
+    'LEFT JOIN git.project ON git.commits.projectid = git.project.id ' +
+    'WHERE git.commits.date' + mysr.db.date +
+    'GROUP BY  projectname ' +
+    'ORDER BY commits DESC ',
+    function(table) {
+      callback(table);
+    }, console.error);
 };
 
 
@@ -286,19 +166,19 @@ mysr.db.topProject = function() {
  */
 mysr.db.getTopCommiterTeam = function(callback) {
   pg.exec('SELECT (git.teams.name) AS teamName,' +
-      'COUNT(git.commits.projectid) AS commits ' +
-      'FROM git.commits ' +
-      'LEFT JOIN git.teamsmembers ' +
-      'ON git.commits.login = git.teamsmembers.login ' +
-      'LEFT JOIN git.teams ON git.teamsmembers.idt = git.teams.id ' +
-      'LEFT JOIN git.project ON git.project.id = git.commits.projectid ' +
+    'COUNT(git.commits.projectid) AS commits ' +
+    'FROM git.commits ' +
+    'LEFT JOIN git.teamsmembers ' +
+    'ON git.commits.login = git.teamsmembers.login ' +
+    'LEFT JOIN git.teams ON git.teamsmembers.idt = git.teams.id ' +
+    'LEFT JOIN git.project ON git.project.id = git.commits.projectid ' +
       //'WHERE git.teams.name NOT LIKE \'%Read\' ' +
-      'WHERE git.commits.date' + mysr.db.date +
-      'GROUP BY  teamName ' +
-      'ORDER BY commits DESC',
-      function(table) {
-        callback(table);
-      }, console.error);
+    'WHERE git.commits.date' + mysr.db.date +
+    'GROUP BY  teamName ' +
+    'ORDER BY commits DESC',
+    function(table) {
+      callback(table);
+    }, console.error);
 };
 
 
@@ -318,17 +198,17 @@ mysr.db.topCommiterTeam = function(response) {
  */
 mysr.db.getTopCommiter = function(callback) {
   pg.exec('SELECT DISTINCT git.commits.login as login,' +
-      'COUNT(git.commits.login) AS count ' +
-      'FROM git.commits ' +
-      'LEFT JOIN git.teamsmembers ' +
-      'ON git.commits.login = git.teamsmembers.login ' +
+    'COUNT(git.commits.login) AS count ' +
+    'FROM git.commits ' +
+    'LEFT JOIN git.teamsmembers ' +
+    'ON git.commits.login = git.teamsmembers.login ' +
       //'WHERE git.teams.name NOT LIKE \'%Read\' ' +
-      'WHERE git.commits.date' + mysr.db.date +
-      'GROUP BY git.commits.login ' +
-      'ORDER BY count DESC',
-      function(table) {
-        callback(table);
-      }, console.error);
+    'WHERE git.commits.date' + mysr.db.date +
+    'GROUP BY git.commits.login ' +
+    'ORDER BY count DESC',
+    function(table) {
+      callback(table);
+    }, console.error);
 };
 
 
@@ -377,7 +257,7 @@ mysr.db.getTeamFileName = function(file, callback) {
       'LEFT JOIN git.teams ON git.teamsmembers.idt = git.teams.id ' +
       'LEFT JOIN git.project ON git.filesname.projectid = git.project.id ' +
       'WHERE git.commits.date' + mysr.db.date +
-      'AND git.teams.name  NOT LIKE \'%Read\' ' +
+
       'AND git.filesname.filename = \'' + file.filename + '\' ' +
       'AND git.project.name = \'' + file.projectname + '\' ' +
       'GROUP BY filename,teamname ' +
@@ -385,6 +265,20 @@ mysr.db.getTeamFileName = function(file, callback) {
       function(table) {
         callback(table);
       }, console.error);
+};
+
+var bla = function() {
+  mysr.db.getFileName(function(files) {
+    for (var i = 0; i < files.length; i++) {
+      //console.log(files[i]);
+      mysr.db.getTeamFileName(files[i], function(table) {
+        if (table.length > 1) {
+          console.log(table);
+        }
+      });
+    }
+
+  });
 };
 
 
@@ -417,14 +311,14 @@ mysr.db.topTeamCommitFileName = function(file, response) {
  */
 mysr.db.getTeamsProjects = function(callback) {
   pg.exec('SELECT git.teamsprojects.projectname AS projectname,' +
-      '(git.teams.name) AS teamName ' +
-      'FROM git.teamsprojects ' +
-      'LEFT JOIN git.teams ON git.teams.id = git.teamsprojects.teamid ' +
-      'GROUP BY  projectname,teamName ' +
-      'ORDER BY projectname ',
-      function(table) {
-        callback(table);
-      }, console.error);
+    '(git.teams.name) AS teamName ' +
+    'FROM git.teamsprojects ' +
+    'LEFT JOIN git.teams ON git.teams.id = git.teamsprojects.teamid ' +
+    'GROUP BY  projectname,teamName ' +
+    'ORDER BY projectname ',
+    function(table) {
+      callback(table);
+    }, console.error);
 };
 
 
@@ -523,4 +417,8 @@ mysr.db.date = mysr.db.sendDate();
 //mysr.db.topCommiter();
 //mysr.db.crossProject();
 
-mysr.init();
+
+bla();
+mysr.db.projectsTeamsCommits();
+
+

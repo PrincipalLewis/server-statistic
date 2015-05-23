@@ -2,6 +2,7 @@
 *.log
 .project
 .idea/
+.test.js
 bin/
 externs/
 node_modules/

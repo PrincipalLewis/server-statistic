@@ -5,6 +5,12 @@ mysr = {};
 
 
 /**
+ * @namespace
+ */
+mysr.db = {};
+
+
+/**
  *
  */
 mysr.pgConnection = function() {};
@@ -14,6 +20,12 @@ mysr.pgConnection = function() {};
  * точка входа
  */
 mysr.init = function() {};
+
+
+/**
+ * @param {function()} response
+ */
+mysr.headers = function(response) {};
 
 
 /**
@@ -33,6 +45,7 @@ mysr.startServer = function(requestHandler) {};
 /**
  * @param {string} since format: YYYY-MM-DD
  * @param {string} until format: YYYY-MM-DD
+ * @return {string}
  */
 mysr.db.sendDate = function(since, until) {};
 
@@ -50,9 +63,21 @@ mysr.db.getProjectsTeamsCount = function(callback) {};
 
 
 /**
+ * @param {function(*)} response
+ */
+mysr.db.projectsTeamsCount = function(response) {};
+
+
+/**
  * @param {function(Array)} callback
  */
 mysr.db.getProjectsCommitCount = function(callback) {};
+
+
+/**
+ * @param {function(*)} response
+ */
+mysr.db.projectsCommitCount = function(response) {};
 
 
 /**
@@ -80,7 +105,7 @@ mysr.db.getTopCommiterTeam = function(callback) {};
 
 
 /**
- *
+ * @param {function(*)} response
  */
 mysr.db.topCommiterTeam = function(response) {};
 
@@ -92,7 +117,7 @@ mysr.db.getTopCommiter = function(callback) {};
 
 
 /**
- *
+ * @param {function(*)} response
  */
 mysr.db.topCommiter = function(response) {};
 
@@ -104,13 +129,21 @@ mysr.db.getFileName = function(callback) {};
 
 
 /**
- *
+ * @param {Object} file
+ * @param {function(Array)} callback
+ */
+mysr.db.getTeamFileName = function(file, callback) {};
+
+
+/**
+ * @param {function(*)} response
  */
 mysr.db.topCommitFileName = function(response) {};
 
 
 /**
- *
+ * @param {Object} file
+ * @param {function(*)} response
  */
 mysr.db.topTeamCommitFileName = function(file, response) {};
 
@@ -119,6 +152,12 @@ mysr.db.topTeamCommitFileName = function(file, response) {};
  * @param {function(Array)} callback
  */
 mysr.db.getTeamsProjects = function(callback) {};
+
+
+/**
+ * @param {function(*)} response
+ */
+mysr.db.teamsProjects = function(response) {};
 
 
 /**

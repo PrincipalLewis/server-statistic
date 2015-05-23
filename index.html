@@ -1,5 +1,10 @@
-<!DOCTYPE html>
 <html>
+<HEAD>
+    <TITLE>surprise mazafaka</TITLE>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+</HEAD>
+
 <body>
 <form onsubmit="sendDate()">
     <div>
@@ -10,6 +15,7 @@
             <input type="date" id="Date2">
         </label>
     </div>
+    <div id="1234">bla</div>
     <input type="submit" value="send">
 </form>
 <br>
@@ -18,30 +24,39 @@
     <div>
         Ty Hui
     </div>
+</form>
+<form>
+    <button onclick="getHui()" type="button">Otvet</button>
+    <button onclick="getFileName()" type="button">FileName</button>
+    <button onclick="getProjectsCommitCount()" type="button">countCommit</button>
+    <button onclick="getTeamsProjects()" type="button">teamProjects</button>
+    <button onclick="getTopCommiter()" type="button">topCommiter</button>
+    <button onclick="getTopCommiterTeam()" type="button">topCommiterTeam</button>
+    <button onclick="getCrossProjects()" type="button">crossProject</button>
+</form>
+
+<form>
     <div id="1">
     </div>
     <div id="2">
     </div>
 </form>
-
-<button onclick="getHui()" type="button">Otvet</button>
-<button onclick="getFileName()" type="button">FileName</button>
-<button onclick="getProjectsCommitCount()" type="button">countCommit</button>
-<button onclick="getTeamsProjects()" type="button">teamProjects</button>
-<button onclick="getTopCommiter()" type="button">topCommiter</button>
-<button onclick="getTopCommiterTeam()" type="button">topCommiterTeam</button>
-
-<table data-toggle="table" data-url="data1.json" data-cache="false" data-height="299">
+<table class="table table-bordered" >
     <thead>
     <tr>
-        <th data-field="id">Item ID</th>
-        <th data-field="name">Item Name</th>
+        <th>Проект-КоличествоКоммитов</th>
+        <th>Имя файла</th>
+        <th>Команды</th>
+        <th>Колличество коммитов</th>
     </tr>
     </thead>
+    <tbody id="tableBody">
+
+    </tbody>
 </table>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-<script src="//netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
