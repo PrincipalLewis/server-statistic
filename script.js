@@ -20,6 +20,9 @@ function getProjectsCommitCount() {
     }
   });
 }
+
+
+
 function getFileName() {
   $.ajax({
     type: 'POST',
@@ -149,3 +152,29 @@ function getCrossProjects() {
     });
   }
 }
+
+function createFileTable(file_name, projects){
+  var table = document.getElementById('tableBody')
+  table.innerHTML +=
+  '<tr>' +
+  '<td>' + file.projectname + ' ' + file.count + '</td>' +
+  '<td>' + file.filename + '</td>'
+    //var obj = JSON.parse(msg);
+    //obj.forEach(function(data) {
+    //  document.getElementById('tableBody').innerHTML +=
+  var obj = {
+    "filenam":"file",
+    "obj.teamname": "team",
+    "obj.count":"10"
+  };
+
+  projects = [obj]
+  var commands ='<td>'
+  var counts ='<td>'
+    for(var project in projects){
+      commands += project.filenam
+       counts += project.count
+    }
+
+}
+
