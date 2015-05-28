@@ -205,9 +205,8 @@ mysr.db.getTopCommiter = function(callback, cancel) {};
 /**
  * @param {!yaa.CompleteHandler} complete
  * @param {!yaa.ErrorHandler} cancel
- * @param {yaa.Input=} opt_item
  */
-mysr.db.getFileName = function(complete, cancel, opt_item) {};
+mysr.db.getFileName = function(complete, cancel) {};
 
 
 /**

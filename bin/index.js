@@ -200,7 +200,6 @@ mysr.api.createCrossObj = function(projectName, teamName) {
  * @return {mysr.Response.error}
  */
 mysr.api.errorHandler = function(response) {
-  console.log('bla');
   return function(code, msg) {
     response.error(code, msg);
   }
@@ -213,7 +212,6 @@ mysr.api.errorHandler = function(response) {
 mysr.api.projectsCommitCount = function(response) {
   mysr.db.getTopProject(function(table) {
     var string = JSON.stringify(table);
-    console.log('bla');
     response.ok(string);
   }, mysr.api.errorHandler(response));
 };
@@ -485,9 +483,8 @@ mysr.db.getTopCommiter = function(callback, cancel) {
 /**
  * @param {!yaa.CompleteHandler} complete
  * @param {!yaa.ErrorHandler} cancel
- * @param {yaa.Input=} opt_item
  */
-mysr.db.getFileName = function(complete, cancel, opt_item) {
+mysr.db.getFileName = function(complete, cancel) {
   pg.exec('SELECT git.filesname.filename as filename, ' +
       'git.project.name as projectname, ' +
       'COUNT(filename) as COUNT ' +
