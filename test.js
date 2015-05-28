@@ -47,19 +47,19 @@ mysr.db.date = '';
  */
 mysr.db.getProjectsTeamsCount = function(callback) {
   pg.exec('SELECT git.project.name AS projectname,' +
-    '(git.teams.name) AS teamName, ' +
-    'COUNT(git.commits.projectid) AS commits ' +
-    'FROM git.commits ' +
-    'LEFT JOIN git.teamsmembers ' +
-    'ON git.commits.login = git.teamsmembers.login ' +
-    'INNER JOIN git.teams ON git.teamsmembers.idt = git.teams.id ' +
-    'LEFT JOIN git.project ON git.project.id = git.commits.projectid ' +
+      '(git.teams.name) AS teamName, ' +
+      'COUNT(git.commits.projectid) AS commits ' +
+      'FROM git.commits ' +
+      'LEFT JOIN git.teamsmembers ' +
+      'ON git.commits.login = git.teamsmembers.login ' +
+      'INNER JOIN git.teams ON git.teamsmembers.idt = git.teams.id ' +
+      'LEFT JOIN git.project ON git.project.id = git.commits.projectid ' +
       //'WHERE git.teams.name NOT LIKE \'%Read\' ' +
-    'GROUP BY  projectname,teamName ' +
-    'ORDER BY projectname,teamName',
-    function(table) {
-      callback(table);
-    }, console.error);
+      'GROUP BY  projectname,teamName ' +
+      'ORDER BY projectname,teamName',
+      function(table) {
+        callback(table);
+      }, console.error);
 };
 
 
@@ -418,7 +418,7 @@ mysr.db.date = mysr.db.sendDate();
 //mysr.db.crossProject();
 
 
-bla();
+//bla();
 mysr.db.projectsTeamsCommits();
 
 

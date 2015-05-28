@@ -1,11 +1,10 @@
 <html>
 <HEAD>
     <TITLE>surprise mazafaka</TITLE>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 </HEAD>
 
-<body>
+<body id="body">
 <form onsubmit="sendDate()">
     <div>
         <label>
@@ -15,24 +14,24 @@
             <input type="date" id="Date2">
         </label>
     </div>
-    <div id="1234">bla</div>
+    <div id="1234"></div>
     <input type="submit" value="send">
 </form>
 <br>
 <br>
 <form >
     <div>
-        Ty Hui
+        Тыкай кнопки
     </div>
 </form>
 <form>
-    <button onclick="getHui()" type="button">Otvet</button>
     <button onclick="getFileName()" type="button">FileName</button>
     <button onclick="getProjectsCommitCount()" type="button">countCommit</button>
     <button onclick="getTeamsProjects()" type="button">teamProjects</button>
     <button onclick="getTopCommiter()" type="button">topCommiter</button>
     <button onclick="getTopCommiterTeam()" type="button">topCommiterTeam</button>
     <button onclick="getCrossProjects()" type="button">crossProject</button>
+    <button onclick="commitTeamProjects()" type="button">commitTeamProjects</button>
 </form>
 
 <form>
@@ -41,14 +40,9 @@
     <div id="2">
     </div>
 </form>
-<table class="table table-bordered" >
-    <thead>
-    <tr>
-        <th>Проект-КоличествоКоммитов</th>
-        <th>Имя файла</th>
-        <th>Команды</th>
-        <th>Колличество коммитов</th>
-    </tr>
+<table class="table table-bordered" id="table" >
+    <thead id="tableHead">
+
     </thead>
     <tbody id="tableBody">
 
@@ -56,7 +50,6 @@
 </table>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

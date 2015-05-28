@@ -11,6 +11,18 @@ mysr.db = {};
 
 
 /**
+ * @namespace
+ */
+mysr.api = {};
+
+
+/**
+ * @namespace
+ */
+mysr.date
+
+
+/**
  *
  */
 mysr.pgConnection = function() {};
@@ -23,23 +35,122 @@ mysr.init = function() {};
 
 
 /**
- * @param {function()} response
- */
-mysr.headers = function(response) {};
-
-
-/**
  * @param {string} path
  * @param {object} payload
- * @param {function()} response
+ * @param {mysr.Response} response
  */
 mysr.router = function(path, payload, response) {};
 
 
 /**
  * Server
+ * @param {mysr.router} requestHandler
  */
 mysr.startServer = function(requestHandler) {};
+
+
+/**
+ * @enum {string}
+ */
+mysr.StatusCode = {
+  'OK': 200,
+  'NOT_FOUND': 404,
+  'INTERNAL_SERVER_ERROR': 500
+};
+
+
+/**
+ *
+ * @param {http.IncomingMessage} response
+ * @constructor
+ */
+mysr.Response = function(response) {};
+
+
+/**
+ * @param {String} data
+ */
+mysr.Response.prototype.ok = function(data) {};
+
+
+/**
+ * @param {number} code
+ * @param {string} message
+ */
+mysr.Response.prototype.error = function(code, message) {};
+
+
+/**
+ * @param {Array} teams
+ * @param {Object} file
+ * @return {Object}
+ */
+mysr.api.createFileNameObj = function(teams, file) {};
+
+
+/**
+ * @param {string} name
+ * @param {*} value
+ * @return {Object}
+ */
+mysr.api.createTeamObj = function(name, value) {};
+
+
+/**
+ * @param {string} projectName
+ * @param {string} teamName
+ * @return {Object}
+ */
+mysr.api.createCrossObj = function(projectName, teamName) {};
+
+
+/**
+ * @param {mysr.Response} response
+ * @return {mysr.Response.error}
+ */
+mysr.api.errorHandler = function(response) {};
+
+
+/**
+ * @param {mysr.Response} response
+ */
+mysr.api.projectsCommitCount = function(response) {};
+
+
+/**
+ * @param {mysr.Response} response
+ */
+mysr.api.projectsTeamsCommits = function(response) {};
+
+
+/**
+ * @param {mysr.Response} response
+ */
+mysr.api.topCommiterTeam = function(response) {};
+
+
+/**
+ * @param {mysr.Response} response
+ */
+mysr.api.topCommiter = function(response) {};
+
+
+/**
+ * @param {mysr.Response} response
+ */
+mysr.api.topCommitFileName = function(response) {};
+
+
+/**
+ * @param {mysr.Response} response
+ */
+mysr.api.teamsProjects = function(response) {};
+
+
+/**
+ * @param {mysr.Response} response
+ */
+mysr.api.crossProject = function(response) {};
 
 
 /**
@@ -58,112 +169,60 @@ mysr.db.date
 
 /**
  * @param {function(Array)} callback
+ * @param {function(number, string)} cancel
  */
-mysr.db.getProjectsTeamsCount = function(callback) {};
-
-
-/**
- * @param {function(*)} response
- */
-mysr.db.projectsTeamsCount = function(response) {};
+mysr.db.getProjectsTeamsCommitCount = function(callback, cancel) {};
 
 
 /**
  * @param {function(Array)} callback
+ * @param {function(number, string)} cancel
  */
-mysr.db.getProjectsCommitCount = function(callback) {};
-
-
-/**
- * @param {function(*)} response
- */
-mysr.db.projectsCommitCount = function(response) {};
-
-
-/**
- *
- */
-mysr.db.projectsTeamsCommits = function() {};
+mysr.db.getProjectsCommitCount = function(callback, cancel) {};
 
 
 /**
  * @param {function(Array)} callback
+ * @param {function(number, string)} cancel
  */
-mysr.db.getTopProject = function(callback) {};
-
-
-/**
- *
- */
-mysr.db.topProject = function() {};
+mysr.db.getTopProject = function(callback, cancel) {};
 
 
 /**
  * @param {function(Array)} callback
+ * @param {function(number, string)} cancel
  */
-mysr.db.getTopCommiterTeam = function(callback) {};
-
-
-/**
- * @param {function(*)} response
- */
-mysr.db.topCommiterTeam = function(response) {};
+mysr.db.getTopCommiterTeam = function(callback, cancel) {};
 
 
 /**
  * @param {function(Array)} callback
+ * @param {function(number, string)} cancel
  */
-mysr.db.getTopCommiter = function(callback) {};
+mysr.db.getTopCommiter = function(callback, cancel) {};
 
 
 /**
- * @param {function(*)} response
+ * @param {!yaa.CompleteHandler} complete
+ * @param {!yaa.ErrorHandler} cancel
+ * @param {yaa.Input=} opt_item
  */
-mysr.db.topCommiter = function(response) {};
+mysr.db.getFileName = function(complete, cancel, opt_item) {};
 
 
 /**
- * @param {function(Array)} callback
+ * @param {!yaa.CompleteHandler} complete
+ * @param {!yaa.ErrorHandler} cancel
+ * @param {yaa.Input} file
  */
-mysr.db.getFileName = function(callback) {};
-
-
-/**
- * @param {Object} file
- * @param {function(Array)} callback
- */
-mysr.db.getTeamFileName = function(file, callback) {};
-
-
-/**
- * @param {function(*)} response
- */
-mysr.db.topCommitFileName = function(response) {};
-
-
-/**
- * @param {Object} file
- * @param {function(*)} response
- */
-mysr.db.topTeamCommitFileName = function(file, response) {};
+mysr.db.getTeamFileName = function(complete, cancel, file) {};
 
 
 /**
  * @param {function(Array)} callback
+ * @param {function(number, string)} cancel
  */
-mysr.db.getTeamsProjects = function(callback) {};
-
-
-/**
- * @param {function(*)} response
- */
-mysr.db.teamsProjects = function(response) {};
-
-
-/**
- *
- */
-mysr.db.crossProject = function() {};
+mysr.db.getTeamsProjects = function(callback, cancel) {};
 
 
 
