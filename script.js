@@ -5,6 +5,7 @@ function getProjectsCommitCount() {
   $.ajax({
     type: 'POST',
     url: 'http://localhost:1337/commitCount',
+    data: getDate(),
     success: function(msg) {
       document.getElementById('tableBody').innerHTML = '';
       document.getElementById('tableHead').innerHTML =
@@ -38,6 +39,7 @@ function getFileName() {
   $.ajax({
     type: 'POST',
     url: 'http://localhost:1337/fileName',
+    data: getDate(),
     success: function(msg) {
       document.getElementById('tableBody').innerHTML = '';
       document.getElementById('tableHead').innerHTML =
@@ -96,6 +98,7 @@ function getTeamsProjects() {
   $.ajax({
     type: 'POST',
     url: 'http://localhost:1337/teamProjects',
+    data: getDate(),
     success: function(msg) {
       document.getElementById('tableBody').innerHTML = '';
       document.getElementById('tableHead').innerHTML =
@@ -128,6 +131,7 @@ function getTopCommiter() {
   $.ajax({
     type: 'POST',
     url: 'http://localhost:1337/topCommiter',
+    data: getDate(),
     success: function(msg) {
       document.getElementById('tableBody').innerHTML = '';
       document.getElementById('tableHead').innerHTML =
@@ -160,6 +164,7 @@ function getTopCommiterTeam() {
   $.ajax({
     type: 'POST',
     url: 'http://localhost:1337/topCommiterTeam',
+    data: getDate(),
     success: function(msg) {
       document.getElementById('tableBody').innerHTML = '';
       document.getElementById('tableHead').innerHTML =
@@ -187,18 +192,27 @@ function getTopCommiterTeam() {
 
 /**
  * Отправка даты
+ * @return {string}
  */
-function sendDate() {
-  $.ajax({
-    type: 'POST',
-    url: 'http://localhost:1337/sendDate',
-    data: document.getElementById('Date1').value + '%' +
-            document.getElementById('Date2').value,
-    success: function(msg) {
-      console.log(msg);
-      document.getElementById('1234').innerHTML = 'bla' + msg;
-    }
-  });
+function getDate() {
+  return document.getElementById('Date1').value + '%' +
+      document.getElementById('Date2').value;
+
+  //setCookie('since', document.getElementById('Date1').value);
+  //setCookie('until', document.getElementById('Date2').value);
+  //console.log('since', getCookie('since'));
+  //console.log('until', getCookie('until'));
+
+  //$.ajax({
+  //  type: 'POST',
+  //  url: 'http://localhost:1337/sendDate',
+  //  data: document.getElementById('Date1').value + '%' +
+  //          document.getElementById('Date2').value,
+  //  success: function(msg) {
+  //    console.log(msg);
+  //    document.getElementById('1').innerHTML = 'bla' + msg;
+  //  }
+  //});
 }
 
 
@@ -209,6 +223,7 @@ function getCrossProjects() {
   $.ajax({
     type: 'POST',
     url: 'http://localhost:1337/cross',
+    data: getDate(),
     success: function(msg) {
       document.getElementById('tableBody').innerHTML = '';
       document.getElementById('tableHead').innerHTML =
@@ -241,6 +256,7 @@ function commitTeamProjects() {
   $.ajax({
     type: 'POST',
     url: 'http://localhost:1337/%',
+    data: getDate(),
     success: function(msg) {
       document.getElementById('tableBody').innerHTML = '';
       var obj = JSON.parse(msg);

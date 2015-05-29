@@ -1,7 +1,7 @@
 /**
  * @namespace
  */
-mysr = {};
+var mysr = {};
 
 
 /**
@@ -17,9 +17,9 @@ mysr.api = {};
 
 
 /**
- * @namespace
+ * @type {string}
  */
-mysr.date
+mysr.date;
 
 
 /**
@@ -36,7 +36,7 @@ mysr.init = function() {};
 
 /**
  * @param {string} path
- * @param {object} payload
+ * @param {string} payload
  * @param {mysr.Response} response
  */
 mysr.router = function(path, payload, response) {};
@@ -44,13 +44,13 @@ mysr.router = function(path, payload, response) {};
 
 /**
  * Server
- * @param {mysr.router} requestHandler
+ * @param {function(string, string, mysr.Response)} requestHandler
  */
 mysr.startServer = function(requestHandler) {};
 
 
 /**
- * @enum {string}
+ * @enum {number}
  */
 mysr.StatusCode = {
   'OK': 200,
@@ -68,7 +68,7 @@ mysr.Response = function(response) {};
 
 
 /**
- * @param {String} data
+ * @param {string} data
  */
 mysr.Response.prototype.ok = function(data) {};
 
@@ -83,7 +83,7 @@ mysr.Response.prototype.error = function(code, message) {};
 /**
  * @param {Array} teams
  * @param {Object} file
- * @return {Object}
+ * @return {{teams: *, file: *}}
  */
 mysr.api.createFileNameObj = function(teams, file) {};
 
@@ -106,39 +106,51 @@ mysr.api.createCrossObj = function(projectName, teamName) {};
 
 /**
  * @param {mysr.Response} response
- * @return {mysr.Response.error}
+ * @return {function(number, string)}
  */
 mysr.api.errorHandler = function(response) {};
 
 
 /**
  * @param {mysr.Response} response
+ * @param {string} date
  */
-mysr.api.projectsCommitCount = function(response) {};
+mysr.api.projectsCommitCount = function(response, date) {};
 
 
 /**
  * @param {mysr.Response} response
+ * @param {string} date
  */
-mysr.api.projectsTeamsCommits = function(response) {};
+mysr.api.projectsTeamsCommits = function(response, date) {};
 
 
 /**
  * @param {mysr.Response} response
+ * @param {string} date
  */
-mysr.api.topCommiterTeam = function(response) {};
+mysr.api.topCommiterTeam = function(response, date) {};
 
 
 /**
  * @param {mysr.Response} response
+ * @param {string} date
  */
-mysr.api.topCommiter = function(response) {};
+mysr.api.topCommiter = function(response, date) {};
 
 
 /**
  * @param {mysr.Response} response
+ * @param {string} date
  */
-mysr.api.topCommitFileName = function(response) {};
+mysr.api.topCommitFileName = function(response, date) {};
+
+
+/**
+ * @param {string} date
+ * @return {!yaa.Step}
+ */
+mysr.api.myIterator = function(date) {};
 
 
 /**
@@ -149,16 +161,16 @@ mysr.api.teamsProjects = function(response) {};
 
 /**
  * @param {mysr.Response} response
+ * @param {string} date
  */
-mysr.api.crossProject = function(response) {};
+mysr.api.crossProject = function(response, date) {};
 
 
 /**
- * @param {string} since format: YYYY-MM-DD
- * @param {string} until format: YYYY-MM-DD
+ * @param {string=} opt_date format: YYYY-MM-DD
  * @return {string}
  */
-mysr.db.sendDate = function(since, until) {};
+mysr.db.getParseDate = function(opt_date) {};
 
 
 /**
@@ -170,51 +182,66 @@ mysr.db.date
 /**
  * @param {function(Array)} callback
  * @param {function(number, string)} cancel
+ * @return {function(Array)}
  */
-mysr.db.getProjectsTeamsCommitCount = function(callback, cancel) {};
+mysr.db.handler = function(callback, cancel) {};
 
 
 /**
  * @param {function(Array)} callback
  * @param {function(number, string)} cancel
+ * @param {string} date
  */
-mysr.db.getProjectsCommitCount = function(callback, cancel) {};
+mysr.db.getProjectsTeamsCommitCount = function(callback, cancel, date) {};
 
 
 /**
  * @param {function(Array)} callback
  * @param {function(number, string)} cancel
+ * @param {string} date
  */
-mysr.db.getTopProject = function(callback, cancel) {};
+mysr.db.getProjectsCommitCount = function(callback, cancel, date) {};
 
 
 /**
  * @param {function(Array)} callback
  * @param {function(number, string)} cancel
+ * @param {string} date
  */
-mysr.db.getTopCommiterTeam = function(callback, cancel) {};
+mysr.db.getTopProject = function(callback, cancel, date) {};
 
 
 /**
  * @param {function(Array)} callback
  * @param {function(number, string)} cancel
+ * @param {string} date
  */
-mysr.db.getTopCommiter = function(callback, cancel) {};
+mysr.db.getTopCommiterTeam = function(callback, cancel, date) {};
+
+
+/**
+ * @param {function(Array)} callback
+ * @param {function(number, string)} cancel
+ * @param {string} date
+ */
+mysr.db.getTopCommiter = function(callback, cancel, date) {};
 
 
 /**
  * @param {!yaa.CompleteHandler} complete
  * @param {!yaa.ErrorHandler} cancel
+ * @param {string} date
  */
-mysr.db.getFileName = function(complete, cancel) {};
+mysr.db.getFileName = function(complete, cancel, date) {};
 
 
 /**
  * @param {!yaa.CompleteHandler} complete
  * @param {!yaa.ErrorHandler} cancel
  * @param {yaa.Input} file
+ * @param {string} date
  */
-mysr.db.getTeamFileName = function(complete, cancel, file) {};
+mysr.db.getTeamFileName = function(complete, cancel, file, date) {};
 
 
 /**

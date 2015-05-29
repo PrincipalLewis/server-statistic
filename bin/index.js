@@ -2,12 +2,14 @@ var http = require('http'),
     url = require('url'),
     path = require('path'),
     fs = require('fs'),
-    pg = require('node-pg');
+    pg = require('node-pg'),
     yaa = require('node-yaa');
+
+
 /**
  * @namespace
  */
-mysr = {};
+var mysr = {};
 
 
 /**
@@ -23,7 +25,7 @@ mysr.api = {};
 
 
 /**
- * @namespace
+ * @type {string}
  */
 mysr.date = '';
 
@@ -56,39 +58,32 @@ mysr.init = function() {
 
 /**
  * @param {string} path
- * @param {object} payload
+ * @param {string} payload
  * @param {mysr.Response} response
  */
 mysr.router = function(path, payload, response) {
   console.log(path);
   switch (path) {
     case '/fileName':
-      mysr.api.topCommitFileName(response);
+      mysr.api.topCommitFileName(response, payload);
       break;
     case '/commitCount':
-      mysr.api.projectsCommitCount(response);
+      mysr.api.projectsCommitCount(response, payload);
       break;
     case '/teamProjects':
       mysr.api.teamsProjects(response);
       break;
     case '/topCommiter':
-      mysr.api.topCommiter(response);
+      mysr.api.topCommiter(response, payload);
       break;
     case '/topCommiterTeam':
-      mysr.api.topCommiterTeam(response);
+      mysr.api.topCommiterTeam(response, payload);
       break;
     case '/cross':
-      //mysr.db.projectsTeamsCount(response);
-      mysr.api.crossProject(response);
+      mysr.api.crossProject(response, payload);
       break;
     case '/%':
-      mysr.api.projectsTeamsCommits(response);
-      break;
-    case '/sendDate':
-      var date = payload.split('%');
-      mysr.db.date = mysr.db.sendDate(date[0], date[1]);
-      console.log(mysr.db.date);
-      response.ok(mysr.db.date);
+      mysr.api.projectsTeamsCommits(response, payload);
       break;
     default: response.error(404, 'Page not found');
   }
@@ -97,7 +92,7 @@ mysr.router = function(path, payload, response) {
 
 /**
  * Server
- * @param {mysr.router} requestHandler
+ * @param {function(string, string, mysr.Response)} requestHandler
  */
 mysr.startServer = function(requestHandler) {
   var server = new http.Server();
@@ -120,7 +115,7 @@ mysr.startServer = function(requestHandler) {
 };
 
 /**
- * @enum {string}
+ * @enum {number}
  */
 mysr.StatusCode = {
   'OK': 200,
@@ -137,16 +132,14 @@ mysr.StatusCode = {
  */
 mysr.Response = function(response) {
   this.__httpResponse = response;
+  this.__HEADERS = {
+    'Access-Control-Allow-Origin': '*',
+    'Content-Type': 'text/plain' };
 };
 
 
-mysr.Response.prototype.__HEADERS = {
-  'Access-Control-Allow-Origin': '*',
-  'Content-Type': 'text/plain' };
-
-
 /**
- * @param {String} data
+ * @param {string} data
  */
 mysr.Response.prototype.ok = function(data) {
 
@@ -168,7 +161,7 @@ mysr.Response.prototype.error = function(code, message) {
 /**
  * @param {Array} teams
  * @param {Object} file
- * @return {Object}
+ * @return {{teams: *, file: *}}
  */
 mysr.api.createFileNameObj = function(teams, file) {
   return {'teams': teams, 'file': file};
@@ -197,7 +190,7 @@ mysr.api.createCrossObj = function(projectName, teamName) {
 
 /**
  * @param {mysr.Response} response
- * @return {mysr.Response.error}
+ * @return {function(number, string)}
  */
 mysr.api.errorHandler = function(response) {
   return function(code, msg) {
@@ -208,20 +201,21 @@ mysr.api.errorHandler = function(response) {
 
 /**
  * @param {mysr.Response} response
+ * @param {string} date
  */
-mysr.api.projectsCommitCount = function(response) {
+mysr.api.projectsCommitCount = function(response, date) {
   mysr.db.getTopProject(function(table) {
     var string = JSON.stringify(table);
     response.ok(string);
-  }, mysr.api.errorHandler(response));
+  }, mysr.api.errorHandler(response), date);
 };
 
 
 /**
  * @param {mysr.Response} response
+ * @param {string} date
  */
-mysr.api.projectsTeamsCommits = function(response) {
-  console.log('изменения проектов по командам');
+mysr.api.projectsTeamsCommits = function(response, date) {
   var myArray = [];
   var flag = 1;
   mysr.db.getProjectsTeamsCommitCount(function(projectsTeams) {
@@ -249,48 +243,74 @@ mysr.api.projectsTeamsCommits = function(response) {
       }
       var string = JSON.stringify(myArray);
       response.ok(string);
-    }, mysr.api.errorHandler(response));
-  }, mysr.api.errorHandler(response));
+    }, mysr.api.errorHandler(response), date);
+  }, mysr.api.errorHandler(response), date);
 };
 
 
 /**
  * @param {mysr.Response} response
+ * @param {string} date
  */
-mysr.api.topCommiterTeam = function(response) {
+mysr.api.topCommiterTeam = function(response, date) {
   mysr.db.getTopCommiterTeam(function(table) {
     var string = JSON.stringify(table);
     response.ok(string);
-  }, mysr.api.errorHandler(response));
+  }, mysr.api.errorHandler(response), date);
 };
 
 
 /**
  * @param {mysr.Response} response
+ * @param {string} date
  */
-mysr.api.topCommiter = function(response) {
+mysr.api.topCommiter = function(response, date) {
   mysr.db.getTopCommiter(function(table) {
     var string = JSON.stringify(table);
-    //console.log(a);
     response.ok(string);
-  }, mysr.api.errorHandler(response));
+  }, mysr.api.errorHandler(response), date);
 };
 
 
 /**
  * @param {mysr.Response} response
+ * @param {string} date
  */
-mysr.api.topCommitFileName = function(response) {
+mysr.api.topCommitFileName = function(response, date) {
   yaa.sequence([
     mysr.db.getFileName,
     yaa.proc.fold.sequence(
         mysr.db.getTeamFileName,
-        yaa.iterator.array()
+        mysr.api.myIterator(date)
     )
-  ]).call(this, function(t) {
+  ]).call(null, function(t) {
     var string = JSON.stringify(t);
     response.ok(string);
-  }, mysr.api.errorHandler(response));
+  }, mysr.api.errorHandler(response), date);
+};
+
+
+/**
+ * @param {string} date
+ * @return {!yaa.Step}
+ */
+mysr.api.myIterator = function(date) {
+  var i = -1;
+
+  /**
+   * @param {!yaa.CompleteHandler} complete
+   * @param {!yaa.ErrorHandler} cancel
+   * @param {!Array} state
+   */
+  function iterator(complete, cancel, state) {
+    //console.log(state[i + 1], date);
+    if (state[i + 1]) {
+      complete(state[i += 1], date);
+    } else {complete()}
+  }
+
+  return yaa.esc(iterator);
+
 };
 
 
@@ -307,9 +327,9 @@ mysr.api.teamsProjects = function(response) {
 
 /**
  * @param {mysr.Response} response
+ * @param {string} date
  */
-mysr.api.crossProject = function(response) {
-  console.log('пересечение комманд');
+mysr.api.crossProject = function(response, date) {
   var myArray = [];
   mysr.db.getTeamsProjects(function(teamsProject) {
     mysr.db.getProjectsTeamsCommitCount(function(projectsTeam) {
@@ -329,7 +349,7 @@ mysr.api.crossProject = function(response) {
       }
       var string = JSON.stringify(myArray);
       response.ok(string);
-    }, mysr.api.errorHandler(response));
+    }, mysr.api.errorHandler(response), date);
   }, mysr.api.errorHandler(response));
 };
 
@@ -344,24 +364,26 @@ pg.init(20, {
 
 
 /**
- * @param {string} since format: YYYY-MM-DD
- * @param {string} until format: YYYY-MM-DD
+ * @param {string=} opt_date format: YYYY-MM-DD
  * @return {string}
  */
-mysr.db.sendDate = function(since, until) {
+mysr.db.getParseDate = function(opt_date) {
+  var date = opt_date.split('%');
+
   var buffer = '';
-  if (!since) {
-    buffer = ' < \'' + until + '\'';
+  if (!date[0]) {
+    buffer = ' <= \'' + date[1] + '\'';
   }
-  if (!until) {
-    buffer = ' > \'' + since + '\'';
+  if (!date[1]) {
+    buffer = ' >= \'' + date[0] + '\'';
   }
-  if (!since && !until) {
-    buffer = ' < current_date ';
+  if (!date[0] && !date[1]) {
+    buffer = ' <= current_date ';
   }
-  if (since && until) {
-    buffer = ' BETWEEN \'' + since + '\' AND \'' + until + '\' ';
+  if (date[0] && date[1]) {
+    buffer = ' BETWEEN \'' + date[0] + '\' AND \'' + date[1] + '\' ';
   }
+  console.log(buffer);
   return buffer;
 };
 
@@ -372,6 +394,11 @@ mysr.db.sendDate = function(since, until) {
 mysr.db.date = '';
 
 
+/**
+ * @param {function(Array)} callback
+ * @param {function(number, string)} cancel
+ * @return {function(Array)}
+ */
 mysr.db.handler = function(callback, cancel) {
   return function(table) {
     if (typeof(table) === 'object') {
@@ -383,6 +410,10 @@ mysr.db.handler = function(callback, cancel) {
 };
 
 
+/**
+* @param {function(number, string)} cancel
+* @return {function(string)}
+*/
 mysr.db.handlerError = function(cancel) {
   return function(error) {
     cancel(mysr.StatusCode.INTERNAL_SERVER_ERROR, error);
@@ -393,8 +424,9 @@ mysr.db.handlerError = function(cancel) {
 /**
  * @param {function(Array)} callback
  * @param {function(number, string)} cancel
+ * @param {string} date
  */
-mysr.db.getProjectsTeamsCommitCount = function(callback, cancel) {
+mysr.db.getProjectsTeamsCommitCount = function(callback, cancel, date) {
   pg.exec('SELECT git.project.name AS projectname,' +
       '(git.teams.name) AS teamName, ' +
       'COUNT(git.commits.projectid) AS commits ' +
@@ -404,6 +436,7 @@ mysr.db.getProjectsTeamsCommitCount = function(callback, cancel) {
       'INNER JOIN git.teams ON git.teamsmembers.idt = git.teams.id ' +
       'LEFT JOIN git.project ON git.project.id = git.commits.projectid ' +
       'WHERE git.teams.name NOT LIKE \'%Read\' ' +
+      'AND git.commits.date' + mysr.db.getParseDate(date) +
       'GROUP BY  projectname,teamName ' +
       'ORDER BY projectname,teamName',
       mysr.db.handler(callback, cancel), mysr.db.handlerError(cancel));
@@ -413,12 +446,14 @@ mysr.db.getProjectsTeamsCommitCount = function(callback, cancel) {
 /**
  * @param {function(Array)} callback
  * @param {function(number, string)} cancel
+ * @param {string} date
  */
-mysr.db.getProjectsCommitCount = function(callback, cancel) {
+mysr.db.getProjectsCommitCount = function(callback, cancel, date) {
   pg.exec('SELECT git.project.name as projectname, ' +
       'COUNT(git.commits.projectid) AS commits ' +
       'FROM git.commits ' +
       'LEFT JOIN git.project ON git.commits.projectid = git.project.id ' +
+      'AND git.commits.date' + mysr.db.getParseDate(date) +
       'GROUP BY  projectname ' +
       'ORDER BY projectname ',
       mysr.db.handler(callback, cancel), mysr.db.handlerError(cancel));
@@ -428,14 +463,15 @@ mysr.db.getProjectsCommitCount = function(callback, cancel) {
 /**
  * @param {function(Array)} callback
  * @param {function(number, string)} cancel
+ * @param {string} date
  */
-mysr.db.getTopProject = function(callback, cancel) {
+mysr.db.getTopProject = function(callback, cancel, date) {
 
   pg.exec('SELECT git.project.name as projectname, ' +
       'COUNT(git.commits.projectid) AS commits ' +
       'FROM git.commits ' +
       'LEFT JOIN git.project ON git.commits.projectid = git.project.id ' +
-      'WHERE git.commits.date' + mysr.db.date +
+      'WHERE git.commits.date' + mysr.db.getParseDate(date) +
       'GROUP BY  projectname ' +
       'ORDER BY commits DESC ',
       mysr.db.handler(callback, cancel), mysr.db.handlerError(cancel));
@@ -445,8 +481,9 @@ mysr.db.getTopProject = function(callback, cancel) {
 /**
  * @param {function(Array)} callback
  * @param {function(number, string)} cancel
+ * @param {string} date
  */
-mysr.db.getTopCommiterTeam = function(callback, cancel) {
+mysr.db.getTopCommiterTeam = function(callback, cancel, date) {
   pg.exec('SELECT (git.teams.name) AS teamName,' +
       'COUNT(git.commits.projectid) AS commits ' +
       'FROM git.commits ' +
@@ -455,7 +492,7 @@ mysr.db.getTopCommiterTeam = function(callback, cancel) {
       'LEFT JOIN git.teams ON git.teamsmembers.idt = git.teams.id ' +
       'LEFT JOIN git.project ON git.project.id = git.commits.projectid ' +
       //'WHERE git.teams.name NOT LIKE \'%Read\' ' +
-      'WHERE git.commits.date' + mysr.db.date +
+      'WHERE git.commits.date' + mysr.db.getParseDate(date) +
       'GROUP BY  teamName ' +
       'ORDER BY commits DESC',
       mysr.db.handler(callback, cancel), mysr.db.handlerError(cancel));
@@ -465,15 +502,16 @@ mysr.db.getTopCommiterTeam = function(callback, cancel) {
 /**
  * @param {function(Array)} callback
  * @param {function(number, string)} cancel
+ * @param {string} date
  */
-mysr.db.getTopCommiter = function(callback, cancel) {
+mysr.db.getTopCommiter = function(callback, cancel, date) {
   pg.exec('SELECT DISTINCT git.commits.login as login,' +
       'COUNT(git.commits.login) AS count ' +
       'FROM git.commits ' +
       'LEFT JOIN git.teamsmembers ' +
       'ON git.commits.login = git.teamsmembers.login ' +
       //'WHERE git.teams.name NOT LIKE \'%Read\' ' +
-      'WHERE git.commits.date' + mysr.db.date +
+      'WHERE git.commits.date' + mysr.db.getParseDate(date) +
       'GROUP BY git.commits.login ' +
       'ORDER BY count DESC',
       mysr.db.handler(callback, cancel), mysr.db.handlerError(cancel));
@@ -483,15 +521,16 @@ mysr.db.getTopCommiter = function(callback, cancel) {
 /**
  * @param {!yaa.CompleteHandler} complete
  * @param {!yaa.ErrorHandler} cancel
+ * @param {string} date
  */
-mysr.db.getFileName = function(complete, cancel) {
+mysr.db.getFileName = function(complete, cancel, date) {
   pg.exec('SELECT git.filesname.filename as filename, ' +
       'git.project.name as projectname, ' +
       'COUNT(filename) as COUNT ' +
       'FROM git.filesname ' +
       'LEFT JOIN git.project ON git.filesname.projectid = git.project.id ' +
       'LEFT JOIN git.commits USING(sha,projectid) ' +
-      'WHERE git.commits.date' + mysr.db.date +
+      'WHERE git.commits.date' + mysr.db.getParseDate(date) +
       'GROUP BY filename, projectname ' +
       'ORDER BY COUNT DESC ' +
       'LIMIT 100',
@@ -503,8 +542,9 @@ mysr.db.getFileName = function(complete, cancel) {
  * @param {!yaa.CompleteHandler} complete
  * @param {!yaa.ErrorHandler} cancel
  * @param {yaa.Input} file
+ * @param {string} date
  */
-mysr.db.getTeamFileName = function(complete, cancel, file) {
+mysr.db.getTeamFileName = function(complete, cancel, file, date) {
   pg.exec('SELECT git.filesname.filename as filename, ' +
       'git.teams.name as teamname, ' +
       '  COUNT(filename) as COUNT ' +
@@ -513,7 +553,7 @@ mysr.db.getTeamFileName = function(complete, cancel, file) {
       'LEFT JOIN git.teamsmembers USING(login) ' +
       'LEFT JOIN git.teams ON git.teamsmembers.idt = git.teams.id ' +
       'LEFT JOIN git.project ON git.filesname.projectid = git.project.id ' +
-      'WHERE git.commits.date' + mysr.db.date +
+      'WHERE git.commits.date' + mysr.db.getParseDate(date) +
       'AND git.teams.name  NOT LIKE \'%Read\' ' +
       'AND git.filesname.filename = \'' + file.filename + '\' ' +
       'AND git.project.name = \'' + file.projectname + '\' ' +
@@ -539,8 +579,5 @@ mysr.db.getTeamsProjects = function(callback, cancel) {
       mysr.db.handler(callback, cancel), mysr.db.handlerError(cancel));
 };
 
-
-
-mysr.db.date = mysr.db.sendDate();
 
 mysr.init();
