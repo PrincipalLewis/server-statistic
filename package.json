@@ -1,9 +1,26 @@
 {
-  "name": "",
+  "name": "server-statistic",
   "version": "0.0.1",
-
   "dependencies": {
-    "node-yaa" : "0.0.2",
-    "node-pg" : "1.1.20-log"
-  }
+    "node-yaa": "0.0.2",
+    "node-pg": "1.1.20-log"
+  },
+  "main": "bin/index.js",
+  "bin": {
+    "server-statistic": "index.js"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PrincipalLewis/server-statistic.git"
+  },
+  "author": "PrincipalLewis",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PrincipalLewis/server-statistic/issues"
+  },
+  "homepage": "https://github.com/PrincipalLewis/server-statistic"
 }
