@@ -5,7 +5,7 @@ function getProjectsCommitCount() {
   $.ajax({
     type: 'POST',
     url: 'http://localhost:1337/commitCount',
-    data: getDate(),
+    data: concatenateDate(),
     success: function(msg) {
       document.getElementById('tableBody').innerHTML = '';
       document.getElementById('tableHead').innerHTML =
@@ -39,7 +39,7 @@ function getFileName() {
   $.ajax({
     type: 'POST',
     url: 'http://localhost:1337/fileName',
-    data: getDate(),
+    data: concatenateDate(),
     success: function(msg) {
       document.getElementById('tableBody').innerHTML = '';
       document.getElementById('tableHead').innerHTML =
@@ -98,7 +98,7 @@ function getTeamsProjects() {
   $.ajax({
     type: 'POST',
     url: 'http://localhost:1337/teamProjects',
-    data: getDate(),
+    data: concatenateDate(),
     success: function(msg) {
       document.getElementById('tableBody').innerHTML = '';
       document.getElementById('tableHead').innerHTML =
@@ -131,7 +131,7 @@ function getTopCommiter() {
   $.ajax({
     type: 'POST',
     url: 'http://localhost:1337/topCommiter',
-    data: getDate(),
+    data: concatenateDate(),
     success: function(msg) {
       document.getElementById('tableBody').innerHTML = '';
       document.getElementById('tableHead').innerHTML =
@@ -164,7 +164,7 @@ function getTopCommiterTeam() {
   $.ajax({
     type: 'POST',
     url: 'http://localhost:1337/topCommiterTeam',
-    data: getDate(),
+    data: concatenateDate(),
     success: function(msg) {
       document.getElementById('tableBody').innerHTML = '';
       document.getElementById('tableHead').innerHTML =
@@ -194,7 +194,7 @@ function getTopCommiterTeam() {
  * Отправка даты
  * @return {string}
  */
-function getDate() {
+function concatenateDate() {
   return document.getElementById('Date1').value + '%' +
       document.getElementById('Date2').value;
 
@@ -223,7 +223,7 @@ function getCrossProjects() {
   $.ajax({
     type: 'POST',
     url: 'http://localhost:1337/cross',
-    data: getDate(),
+    data: concatenateDate(),
     success: function(msg) {
       document.getElementById('tableBody').innerHTML = '';
       document.getElementById('tableHead').innerHTML =
@@ -256,7 +256,7 @@ function commitTeamProjects() {
   $.ajax({
     type: 'POST',
     url: 'http://localhost:1337/%',
-    data: getDate(),
+    data: concatenateDate(),
     success: function(msg) {
       document.getElementById('tableBody').innerHTML = '';
       var obj = JSON.parse(msg);

@@ -47,7 +47,7 @@ mysr.pgConnection = function() {
  * точка входа
  */
 mysr.init = function() {
-
+  console.log('xuy');
   process.addListener('uncaughtException', function(error) {
     console.error('Uncaught Exception', error);
   });
@@ -102,7 +102,6 @@ mysr.startServer = function(requestHandler) {
 
     req.on('data', function(chunk) {
       data += chunk;
-
     });
 
     req.on('end', function() {
@@ -303,7 +302,6 @@ mysr.api.myIterator = function(date) {
    * @param {!Array} state
    */
   function iterator(complete, cancel, state) {
-    //console.log(state[i + 1], date);
     if (state[i + 1]) {
       complete(state[i += 1], date);
     } else {complete()}
@@ -383,7 +381,6 @@ mysr.db.getParseDate = function(opt_date) {
   if (date[0] && date[1]) {
     buffer = ' BETWEEN \'' + date[0] + '\' AND \'' + date[1] + '\' ';
   }
-  console.log(buffer);
   return buffer;
 };
 
